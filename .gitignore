@@ -1,0 +1,66 @@
+## Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+## Virtual environments
+.venv/
+venv/
+env/
+
+## OS files
+.DS_Store
+
+## Jupyter
+*.ipynb_checkpoints/
+
+## Build / dist
+build/
+dist/
+*.egg-info/
+
+## Test / coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+## Logs
+logs/
+*.log
+
+## Model artifacts
+models/*.keras
+models/*.h5
+models/*.ckpt
+models/checkpoints/
+
+## Data (raw & derived) - regenerate from source videos
+data/raw/
+data/organized/
+data/frames/
+data/npz/
+
+## Temporary label maps (can regenerate)
+data/**/_labels.json
+
+## TensorBoard
+tensorboard/
+events.out.tfevents*
+
+## IDE
+.vscode/
+*.code-workspace
+
+## Environment files (allow sample templates instead)
+*.env
+*.env.local
+
+## Mac metadata
+._*
+
+## Backup / tmp
+*.bak
+*.tmp
+tmp/

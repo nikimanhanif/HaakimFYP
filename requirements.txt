@@ -1,0 +1,9 @@
+numpy>=1.26,<2.0
+pandas>=2.2,<2.3
+opencv-python>=4.8,<5.0
+Pillow>=10,<12
+moviepy>=1.0.3,<3.0
+matplotlib>=3.8,<3.9
+# macOS Apple Silicon (Python 3.11)
+tensorflow-macos==2.16.2
+tensorflow-metal==1.2.0
