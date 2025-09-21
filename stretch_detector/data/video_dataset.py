@@ -219,3 +219,58 @@ def build_arrays_for_split(cfg: Config, split: str) -> Tuple[np.ndarray, np.ndar
     cache.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(cache, X=X, y=y)
     return X, y
+
+
+# ---- Added convenience prepare step to restore prior CLI workflow ----
+_VIDEO_EXTS = {".mp4", ".mov", ".avi", ".mkv", ".mpeg", ".mpg"}
+
+
+def _gather_videos(split_dir: Path) -> List[Path]:
+    if not split_dir.exists():
+        return []
+    vids: List[Path] = []
+    for p in split_dir.rglob("*"):
+        if p.is_file() and p.suffix.lower() in _VIDEO_EXTS:
+            vids.append(p)
+    return vids
+
+
+def prepare_frames(cfg: Config) -> SplitPaths:
+    """Scan raw_videos_dir for train/val/test splits, infer labels, write label maps, and extract frames.
+
+    Layout expected (flexible nesting allowed):
+        raw/
+          train/ <videos or folders>
+          val/   <videos or folders>
+          test/  <videos or folders>
+
+    For each split we:
+      1. Collect all video files by extension.
+      2. Write a _labels.json mapping (video stem -> class id) for future frame directory resolution.
+      3. Extract ~1 fps grayscale frames into frames/<split>/<video_stem>/frame#.jpg
+
+    Returns a SplitPaths of the original video file lists for reference.
+    """
+    fx = FrameExtractor(cfg)
+    raw_root = cfg.raw_videos_dir
+    train_videos = _gather_videos(raw_root / "train")
+    val_videos = _gather_videos(raw_root / "val")
+    test_videos = _gather_videos(raw_root / "test")
+
+    # Persist label maps BEFORE extraction so frame dirs (video stems) are mapped.
+    if train_videos:
+        _write_labels_json(cfg, "train", train_videos)
+    if val_videos:
+        _write_labels_json(cfg, "val", val_videos)
+    if test_videos:
+        _write_labels_json(cfg, "test", test_videos)
+
+    if train_videos:
+        fx.extract_split(train_videos, "train")
+    if val_videos:
+        fx.extract_split(val_videos, "val")
+    if test_videos:
+        fx.extract_split(test_videos, "test")
+
+    return SplitPaths(train=train_videos, val=val_videos, test=test_videos)
+
